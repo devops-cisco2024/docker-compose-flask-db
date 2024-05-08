@@ -1,0 +1,22 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title> Register </title>            
+    </head>
+    <body></br></br></br></br></br>
+             <div class="header">
+                <h1 class="word">Login</h1>
+             </div></br></br></br>
+             <div class="ipadd">{{ ipadd }}</div>
+            <h2 class="word">
+                <form action="{{ url_for('register') }}" method="post">
+                    <input id="username" name="username" type="text" placeholder="Enter Your Username" class="textbox"/></br></br>
+                    <input id="password" name="password" type="password" placeholder="Enter Your Password" class="textbox"/></br></br>
+                    <input type="submit" class="btn" value="sign in"></br>
+                </form>
+            </h2>
+            <p class="bottom">Registration?  <a class="bottom" href="{{url_for('register')}}"> Registration</a></p>
+          </div>
+        </div>
+    </body>
+</html>
