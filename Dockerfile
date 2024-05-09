@@ -1,11 +1,15 @@
-FROM python:3.9-alpine AS builder
+FROM python:slim AS builder
 COPY requirements.txt .
-RUN pip install --prefix=/install -r requirements.txt 
+RUN apt-get update && \
+    apt-get install -y libmariadb-dev libmariadb3 gcc && \
+    pip install --prefix=/temp -r requirements.txt 
 
-FROM python:3.9-alpine
-RUN pip cache purge
-COPY app.py /app/app.pyq
-COPY --from=builder /install /usr/local
+FROM python:slim
+RUN apt-get update && \ 
+    apt-get install -y libmariadb-dev
+COPY app.py databasefunctions.py /app/
+COPY /templates   /app/templates
+COPY --from=builder /temp /usr/local
 
 WORKDIR /app
 

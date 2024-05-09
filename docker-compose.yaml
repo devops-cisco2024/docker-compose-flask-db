@@ -3,19 +3,39 @@ services:
     build: .
     command: python -u app.py
     ports:
-      - "5000:5000"
-    # volumes:
-    #   - .:/app
+      - "8888:8888"
     links:
       - db
+    networks:
+      - backend
+      - frontend
+
   db:
-    image: mongo
-    hostname: test_mongodb
+    image: mariadb:lts
+    hostname: customer_db
     environment:
-      - MONGO_INITDB_DATABASE=test_db
-      - MONGO_INITDB_ROOT_USERNAME=root
-      - MONGO_INITDB_ROOT_PASSWORD=pass
-    volumes:
-      - ./init-db.js:/docker-entrypoint-initdb.d/init-db.js:rw
+      - MARIADB_USER=user1
+      - MARIADB_PASSWORD=password1
+      - MARIADB_DATABASE=visitors
+      - MARIADB_ROOT_PASSWORD=my-secret-pw
+
     ports:
       - 27017:27017
+    networks:
+      - backend
+
+
+  # proxy:
+  #   build: proxy
+  #   restart: always
+  #   ports:
+  #     - 80:80
+  #   depends_on: 
+  #     - app
+  #   networks:
+  #      - frontend
+
+
+networks:
+  backend:
+  frontend: 
