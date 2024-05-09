@@ -20,7 +20,7 @@ services:
       - MARIADB_ROOT_PASSWORD=my-secret-pw
 
     ports:
-      - 27017:27017
+      - 3306:3306
     networks:
       - backend
 
