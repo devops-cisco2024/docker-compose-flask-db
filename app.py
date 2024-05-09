@@ -1,74 +1,88 @@
-from pymongo import MongoClient
+
 from flask import Flask, request,redirect,render_template
-import datetime
-import re
+from random import randint
+import databasefunctions as dbf
+from hashlib import sha256
 app = Flask(__name__)
 app.secret_key = "secretkey"
+dbname = "visitors"
+password="password1"
+user="user1"
+host="192.168.142.136"
+table_name = "visitors_info"
+port=3306
+value_int = 1
+
+#redirect on accept and not page
+@app.route('/start', methods =['GET', 'POST'])
+def start():
+    return render_template('accept_not.html')
+
+#if accept 
+@app.route("/move_accept/", methods=['POST'])
+def move_accept():
+    ip_addr = request.remote_addr
+    hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
+    dbf.update_row(dbname,table_name,hash_id,column_name="ip",text_value=str(ip_addr),ip=host,user=user,password=password)
+    return render_template('register.html')
+
+#if not
+@app.route("/move_notaccept/", methods=['POST'])
+def move_notaccept():
+    #Moving forward code
+    return render_template('register.html')
+
+
 @app.route('/register', methods =['GET', 'POST'])
 def register():
     ip_addr = request.remote_addr
-    if request.method == 'POST' and 'username' in request.form and 'password' in request.form and 'email' in request.form :
-        username = request.form['username']
-        password = request.form['password']
-        email = request.form['email']
-        if get_database_collection().find_one({"username":username}):
-            msg = 'Username already exists !'
-        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
-            msg = 'Invalid email address !'
-        else:
-            x = get_database_collection()
-            x.update_one({"ip":ip_addr},{"$set": { "username": username, "password": password, "email": email, "registration": 'yes'} })
-            msg = 'You have successfully registered !'
-    msg = 'registration'
-    return render_template('register.html', msg = msg)
+    hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
+    if request.method == 'POST' and 'text' in request.form  :
+        text = request.form['text']
+        dbf.update_row(dbname,table_name,hash_id,column_name="text",text_value=text,ip=host,user=user,password=password)
+
+    return render_template('register.html', msg = text)
+
+
 @app.route('/')
 def start_page():
     ip_addr = request.remote_addr
-    time = datetime.datetime.now()
-    if get_database_collection().find_one({"ip":ip_addr}):
-        print(get_database_collection().find_one({"ip":ip_addr}))
-        return redirect('/start')
-    else:
-        visitor = {"ip": ip_addr,"time": time,"registration": "no"}
-        visitor_collection_visitor = get_database_collection().insert_one(visitor)
-        visitor_collection_visitor.inserted_id
+    global value_int
+    hash_ip = sha256(str(ip_addr).encode()).hexdigest()
+    value = dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password)
+    print(value)
+    if len(value or '')>=1:
+        print(value)
         return redirect('/register')
-@app.route('/start')
-def start():
-    ip_addr = request.remote_addr
-    return render_template('start.html', msg = ip_addr)
+    else:
+        while True:
+            hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
+            value_find_in_table = dbf.find_in_table(dbname,table_name,column_name="id",search_value=str(hash_id),ip=host,user=user,password=password)
+            if len(value_find_in_table or '')>=1:
+                value_int+=1
+            else:
+                dbf.insert_in_table(dbname,table_name,columns_names="id",values=hash_id,ip=host,user=user,password=password)
+                dbf.update_row(dbname,table_name,hash_id,column_name="hash_ip",text_value=hash_ip,ip=host,user=user,password=password)
+                return redirect('/start')
+    
 
-# @app.route('/')
-# def client():
-#     ip_addr = request.environ['REMOTE_ADDR']
-#     return '<h1> Your IP address is:' + ip_addr
+
+# 
+# 
+# ip_addr = request.environ['REMOTE_ADDR']
+# 
 
 
-# @app.route('/')
-# def proxy_client():
-#     ip_addr = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
-#     return ip_addr
-def get_database_collection():
-    dbname = get_database()
-    visitor_collection = dbname["visitors_col"]
-    return visitor_collection
-def get_database():
- 
-   # Provide the mongodb atlas url to connect python to mongodb using pymongo
-   CONNECTION_STRING = "mongodb+srv://oleksandrzaichko:h6UEVK4LvXAg4Udi@cluster0.0ramhdt.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
- 
-   # Create a connection using MongoClient. You can import MongoClient or use pymongo.MongoClient
-   client = MongoClient(CONNECTION_STRING)
-   # Create the database for our example (we will use the same database throughout the tutorial
-   return client['who_logged_list']
-  
-# This is added so that many files can reuse the function get_database()
-def write_logged_user():
-    dbname = get_database()
-    visitor_collection = dbname["visitors_col"]
+# 
+# 
+# ip_addr = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
+# 
 if __name__ == "__main__":   
    # write logged user 
 
-   # Get the database
-
+   
+   dbf.create_table(dbname,table_name,ip=host,user=user,password=password)
+   dbf.add_column(dbname,table_name,column_name="id",value_type="varchar(80)",ip=host,user=user,password=password)
+   dbf.add_column(dbname,table_name,column_name="ip",value_type="varchar(80)",ip=host,user=user,password=password)
+   dbf.add_column(dbname,table_name,column_name="text",value_type="varchar(80)",ip=host,user=user,password=password)
    app.run(debug=True,port=8888,host='0.0.0.0')

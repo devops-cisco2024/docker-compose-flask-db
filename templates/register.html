@@ -10,13 +10,11 @@
             <h2 class="word">
                 <form action="{{ url_for('register') }}" method="post">
                   <div class="msg">{{ msg }}</div>
-                    <input id="username" name="username" type="text" placeholder="Enter Your Username" class="textbox"/></br></br>
-                    <input id="password" name="password" type="password" placeholder="Enter Your Password" class="textbox"/></br></br>
-                    <input id="email" name="email" type="text" placeholder="Enter Your Email ID" class="textbox"/></br></br>
-                    <input type="submit" class="btn" value="Sign Up"></br>
+                    <input id="text" name="text" type="text" placeholder="Enter Your text" class="textbox"/></br></br>
+                    <input type="submit" class="btn" value="Send text"></br>
                 </form>
             </h2>
-            <p class="bottom">Already have an account or dont whant to register?  <a class="bottom" href="{{url_for('start_page')}}"> Sign In here</a><a class="bottom" href="{{url_for('start_page')}}"> not register</a></p>
+            <p class="bottom">SEND  <a class="bottom" href="{{url_for('start_page')}}"> Sign In here</a><a class="bottom" href="{{url_for('start_page')}}"> DENY</a></p>
           </div>
         </div>
     </body>
