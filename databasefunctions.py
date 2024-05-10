@@ -104,7 +104,7 @@ def find_in_table(dbname,table_name,column_name,search_value,ip,user,password):
         mariadbConnection = connection_to_db(ip,dbname,user,password)
         cursor = mariadbConnection.cursor()
         print("Connected to mariadb")
-        sql_update_query = """SELECT * FROM %s WHERE %s = %s"""
+        sql_update_query = """SELECT * FROM %s WHERE %s = '%s'"""
         cursor.execute(sql_update_query % (table_name,column_name,search_value))
         value = cursor.fetchall()
         cursor.close()
@@ -112,6 +112,25 @@ def find_in_table(dbname,table_name,column_name,search_value,ip,user,password):
 
     except mariadb.Error as error:
         print("Failed to get value from the table in mariadb", error)
+    finally:
+        if mariadbConnection:
+            mariadbConnection.close()
+            print("The mariadb connection is closed")
+
+#we are deleting row from table
+def delete_row_in_table(dbname,table_name,column_name,search_value,ip,user,password):
+    try:
+        mariadbConnection = connection_to_db(ip,dbname,user,password)
+        cursor = mariadbConnection.cursor()
+        print("Connected to mariadb for deleting")
+        sql_update_query = """DELETE FROM %s WHERE %s = '%s'"""
+        cursor.execute(sql_update_query % (table_name,column_name,search_value))
+        mariadbConnection.commit()
+        print("Deleting is successfully")
+        cursor.close()
+
+    except mariadb.Error as error:
+        print("Failed to DELETE value from the table in mariadb", error)
     finally:
         if mariadbConnection:
             mariadbConnection.close()
