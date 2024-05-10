@@ -24,24 +24,40 @@ def move_accept():
     ip_addr = request.remote_addr
     hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
     dbf.update_row(dbname,table_name,hash_id,column_name="ip",text_value=str(ip_addr),ip=host,user=user,password=password)
-    return render_template('register.html')
+    return redirect('/register')
 
 #if not
 @app.route("/move_notaccept/", methods=['POST'])
 def move_notaccept():
     #Moving forward code
-    return render_template('register.html')
+    return redirect('/register')
+
+
+#if our visitor whant to delete value from table
+@app.route("/move_delete/", methods=['POST'])
+def move_delete():
+    ip_addr = request.remote_addr
+    hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
+    dbf.delete_row_in_table(dbname,table_name,column_name="id",search_value=str(hash_id),ip=host,user=user,password=password)
+    return render_template('start.html')
 
 
 @app.route('/register', methods =['GET', 'POST'])
 def register():
     ip_addr = request.remote_addr
     hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
-    if request.method == 'POST' and 'text' in request.form  :
-        text = request.form['text']
-        dbf.update_row(dbname,table_name,hash_id,column_name="text",text_value=text,ip=host,user=user,password=password)
+    text = "you have been here"
+    value = ""
+    value_ip = dbf.find_in_table(dbname,table_name,column_name="ip",search_value=str(ip_addr),ip=host,user=user,password=password)
+    print(value)
+    if len(value_ip or '')>=1:
+        return render_template('register.html', msg = text,value=ip_addr)
+    else:
+        if request.method == 'POST' and 'text' in request.form  :
+            text = request.form['text']
+            dbf.update_row(dbname,table_name,hash_id,column_name="text",text_value=text,ip=host,user=user,password=password)
 
-    return render_template('register.html', msg = text)
+        return render_template('register.html', msg = text)
 
 
 @app.route('/')
@@ -52,7 +68,6 @@ def start_page():
     value = dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password)
     print(value)
     if len(value or '')>=1:
-        print(value)
         return redirect('/register')
     else:
         while True:

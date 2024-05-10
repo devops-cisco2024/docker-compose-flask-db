@@ -5,16 +5,19 @@
     </head>
     <body></br></br></br></br></br>
              <div class="header">
-                <h1 class="word">Register</h1>
+                <h1 class="word">Write any text you whant and it will be registrated</h1>
              </div></br></br></br>
             <h2 class="word">
                 <form action="{{ url_for('register') }}" method="post">
                   <div class="msg">{{ msg }}</div>
-                    <input id="text" name="text" type="text" placeholder="Enter Your text" class="textbox"/></br></br>
-                    <input type="submit" class="btn" value="Send text"></br>
+                  <div class="msg">{{ value }}</div>
+                    <input id="text" name="text" type="text" placeholder="Enter Your text" class="textbox" style="font-size: 40px;height: 50px;"/></br></br>
+                    <input type="submit" class="btn" value="Send text" style="background-color: rgb(37, 5, 112);color: #fffefe;width: 30%;font-size: 40px;"></br>
                 </form>
             </h2>
-            <p class="bottom">SEND  <a class="bottom" href="{{url_for('start_page')}}"> Sign In here</a><a class="bottom" href="{{url_for('start_page')}}"> DENY</a></p>
+            <form action="/move_delete/" method="post">
+              <button name="forwardBtn" type="submit" style="background-color: red;color: #fffefe;width: 30%;font-size: 40px;">Delete your data</button>
+          </form>
           </div>
         </div>
     </body>
