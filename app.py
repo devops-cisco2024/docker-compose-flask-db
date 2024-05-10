@@ -3,14 +3,15 @@ from flask import Flask, request,redirect,render_template
 from random import randint
 import databasefunctions as dbf
 from hashlib import sha256
+import secretsfile
 app = Flask(__name__)
-app.secret_key = "secretkey"
-dbname = "visitors"
-password="password1"
-user="user1"
-host="192.168.142.136"
-table_name = "visitors_info"
-port=3306
+app.secret_key = secretsfile.secret_key
+dbname = secretsfile.dbname
+password=secretsfile.password
+user=secretsfile.user
+host=secretsfile.host
+table_name = secretsfile.table_name
+port=secretsfile.port
 value_int = 1
 
 #redirect on accept and not page
@@ -46,7 +47,7 @@ def move_delete():
 def register():
     ip_addr = request.remote_addr
     hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
-    text = "you have been here"
+    text = "you are here"
     value = ""
     value_ip = dbf.find_in_table(dbname,table_name,column_name="ip",search_value=str(ip_addr),ip=host,user=user,password=password)
     print(value)
