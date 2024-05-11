@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title> premessaging </title>            
+    </head>
+    <body></br></br></br></br></br>
+             <div class="header">
+                <h1 class="word">you can write message</h1>
+             </div></br></br></br>
+            <h2 class="word">
+                <div class="msg">{{ recieved_messages }}</div>
+                <div class="msg">{{ your_login }}</div>
+                <form action="/pre_messaging/delete_message/" method="post">
+                    <button name="forwardBtn" type="submit" style="background-color: rgb(88, 4, 4);color: #fffefe;width: 30%;font-size: 40px;">Delete message</button>
+                </form>
+                <form action="{{ url_for('messaging') }}" method="post">
+                  <div class="msg">{{ msg }}</div>
+                    <input id="text" name="reciever" type="text" placeholder="Enter Reciever" class="textbox" style="font-size: 40px;height: 50px;"/></br></br>
+                    <input id="text" name="message" type="text" placeholder="Enter Message" class="textbox" style="font-size: 40px;height: 50px;"/></br></br>
+                    <input type="submit" class="btn" value="Send text" style="background-color: rgb(37, 5, 112);color: #fffefe;width: 30%;font-size: 40px;"></br>
+                </form>
+            </h2>
+          </div>
+        </div>
+        <script>
+           async function myFunction1() {
+            const a = await fetch("/changerow?data="+1)
+            }
+        async function myFunction2() {
+            const a = await fetch("/changerow?data="-1)
+            } 
+        </script>
+    </body>
+</html>
