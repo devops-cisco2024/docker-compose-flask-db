@@ -15,6 +15,11 @@ services:
   db:
     image: mariadb:lts
     restart: always
+    healthcheck:
+      test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 --password="$$(cat /run/secrets/db-password)" --silent']
+      interval: 3s
+      retries: 5
+      start_period: 30s    
     environment:
       - MARIADB_USER=user1
       - MARIADB_PASSWORD=password1
