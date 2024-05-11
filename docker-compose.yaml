@@ -1,33 +1,29 @@
-version: '3'
+version: "3"
 services:
   app:
     build: .
     restart: always
     command: python -u app.py
-    # ports:
-    #   - "8888:8888"
-    links:
-      - db
+    depends_on:
+      db:
+        condition: service_healthy
+
     networks:
       - backend
       - frontend
 
   db:
     image: mariadb:lts
-    restart: always
     healthcheck:
-      test: ['CMD-SHELL', 'mysqladmin ping -h 127.0.0.1 --password="$$(cat /run/secrets/db-password)" --silent']
+      test: ["CMD", "mariadb", "--version", "--silent"]
       interval: 3s
       retries: 5
-      start_period: 30s    
+      start_period: 30s
     environment:
       - MARIADB_USER=user1
       - MARIADB_PASSWORD=password1
       - MARIADB_DATABASE=visitors
       - MARIADB_ROOT_PASSWORD=my-secret-pw
-
-    ports:
-      - 3306:3306
     networks:
       - backend
 
@@ -37,6 +33,7 @@ services:
     restart: always
     ports:
       - 80:80
+      - 443:443
     depends_on: 
       - app
     networks:
