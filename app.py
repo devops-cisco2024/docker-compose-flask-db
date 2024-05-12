@@ -1,6 +1,7 @@
 
 from flask import Flask, request,redirect,render_template
 import requests
+from random import sample
 import databasefunctions as dbf
 from hashlib import sha256,md5
 import secretsfile
@@ -65,7 +66,7 @@ def pre_messaging():
         senders_texts += str(i[1]) + 'to'+ decryption(str(sender_hash+hash_id),i[3]).decode('utf-8')
 
      #check number of messages to you from different users
-    if len(name_in_table or '')>=1 and name_in_table[0][3] is not None:
+    if len(name_in_table or '')>=2 and name_in_table[0][3] is not None:
         return redirect('/pre_messaging/messaging')
     
     else:
@@ -105,13 +106,20 @@ def messaging():
     #check messages sended to different users
     for i in value_find_sender:
         reciever_hash = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(i[2]),ip=host,user=user,password=password)[0][0]
-        senders_texts += ' Sended message: '+ decryption(str(hash_id+reciever_hash),i[3]).decode('utf-8') +"; to " + str(i[2])
+        senders_texts += ' Sended message: '+ decryption(str(hash_id+reciever_hash),i[3]).decode('utf-8') +" to " + str(i[2]) +";"
 
     #check messages recived from different users
     for i in value_find:
         sender_hash = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(i[1]),ip=host,user=user,password=password)[0][0]
-        recieved_texts += str(i[1]) + ' to you message:  '+ decryption(str(sender_hash+hash_id),i[3]).decode('utf-8')
+        recieved_texts += " "+ str(i[1]) + ' to you message:  '+ decryption(str(sender_hash+hash_id),i[3]).decode('utf-8') +";"
+    
 
+    #who is ready to talk 
+    ready_to_talk= dbf.find_column_in_table(dbname,table_name,column_name="login",ip=host,user=user,password=password)
+    Ready_talk=''
+    for i in sample(ready_to_talk,1):
+        if i is not None:
+            Ready_talk+= ''+str(i[0])
 
     # send message from you to another user
     if request.method == 'POST' and 'message' in request.form and 'reciever' in request.form  :
@@ -120,13 +128,13 @@ def messaging():
             number_of_messages = (dbf.find_in_table(dbname,"messaging",column_name="reciever",search_value=reciever,ip=host,user=user,password=password) or '')
             
             #max number of messages to you from different users
-            if len(number_of_messages) >= 1:
-                return render_template('messaging.html',msg = "Max number of messages to reciever",your_login=sender)
+            if len(number_of_messages) >= 2:
+                return render_template('messaging.html',msg = "Max number of messages to reciever",your_login=sender,ready_talkers=Ready_talk)
             
             else:
                 #max len of the message,wich you can send
                 if len(message) >= 100:
-                    return render_template('messaging.html', msg = 'Message is too long')
+                    return render_template('messaging.html', msg = 'Message is too long',ready_talkers=Ready_talk)
 
                 #print(dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password))
                 value_find_in_table = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(reciever),ip=host,user=user,password=password)
@@ -140,13 +148,13 @@ def messaging():
                     dbf.update_row(dbname,'messaging','id',message_number,column_name="sender",text_value=sender,ip=host,user=user,password=password)
                     dbf.update_row(dbname,'messaging','id',message_number,column_name="reciever",text_value=reciever,ip=host,user=user,password=password)
                     dbf.update_row(dbname,'messaging','id',message_number,column_name="message",text_value=str(send_message),ip=host,user=user,password=password)
-
-                    return render_template('messaging.html', msg = 'Sended message ',recieved_messages= recieved_texts, your_login=sender, sended_messages= senders_texts)
+                    sended_message = ' Sended message: ' +str(message)+ ' to '+ str(reciever)
+                    return render_template('messaging.html', msg = 'Sended message ',recieved_messages= recieved_texts, your_login=sender, sended_messages= sended_message)
                 else:
                     
-                    return render_template('messaging.html',msg = "message field is empty or reciever doesnt exist",recieved_messages= recieved_texts, your_login=sender, sended_messages= senders_texts)
+                    return render_template('messaging.html',msg = "message field is empty or reciever doesnt exist",recieved_messages= recieved_texts, your_login=sender, sended_messages= senders_texts,ready_talkers=Ready_talk)
     else: 
-        return render_template('messaging.html',msg = "hi on messaging", recieved_messages=recieved_texts, your_login=sender, sended_messages= senders_texts)
+        return render_template('messaging.html',msg = "hi on messaging", recieved_messages=recieved_texts, your_login=sender, sended_messages= senders_texts,ready_talkers=Ready_talk)
 
 
 #redirect on accept and not page
