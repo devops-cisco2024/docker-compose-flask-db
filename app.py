@@ -141,7 +141,6 @@ def messaging():
                 #if we found that reciever exists than
                 if len(value_find_in_table or '')>=1:
                     lens_of_messages =sha256((str(randint(0,1000)+randint(0,1000))).encode()).hexdigest()
-                    print(lens_of_messages)
                     secret1 = dbf.find_in_table(dbname,table_name,column_name="login",search_value=reciever,ip=host,user=user,password=password)[0][0]
                     secret2 = dbf.find_in_table(dbname,table_name,column_name="login",search_value=sender,ip=host,user=user,password=password)[0][0]
                     send_message = encryption(str(secret1+secret2),message)
