@@ -1,7 +1,7 @@
 
 from flask import Flask, request,redirect,render_template
 import requests
-from random import sample
+from random import sample,randint
 import databasefunctions as dbf
 from hashlib import sha256,md5
 import secretsfile
@@ -140,8 +140,7 @@ def messaging():
                 value_find_in_table = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(reciever),ip=host,user=user,password=password)
                 #if we found that reciever exists than
                 if len(value_find_in_table or '')>=1:
-                    lens_of_messages = len(dbf.find_in_table(dbname,'messaging',column_name="sender",search_value=sender,ip=host,user=user,password=password))
-                    lens_of_messages +=1
+                    lens_of_messages =sha256((str(randint(0,1000)+randint(0,1000))).encode()).hexdigest()
                     print(lens_of_messages)
                     secret1 = dbf.find_in_table(dbname,table_name,column_name="login",search_value=reciever,ip=host,user=user,password=password)[0][0]
                     secret2 = dbf.find_in_table(dbname,table_name,column_name="login",search_value=sender,ip=host,user=user,password=password)[0][0]
