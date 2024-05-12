@@ -75,7 +75,7 @@ def pre_messaging():
             value_find_in_table = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(text),ip=host,user=user,password=password)
             if len(value_find_in_table or '')>=1:
 
-                return render_template('pre_messaging.html', msg = 'This login is used',recieved_message = senders_texts,your_login=sender)
+                return render_template('premessaging.html', msg = 'This login is used',recieved_message = senders_texts,your_login=sender)
             else:
                 dbf.update_row(dbname,table_name,'id',hash_id,column_name="login",text_value=text,ip=host,user=user,password=password)
                 return redirect('/pre_messaging/messaging')
@@ -99,8 +99,8 @@ def messaging():
     hash_ip = sha256(str(ip_addr).encode()).hexdigest() #hashed ip
     hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest() #hashed id
     sender = dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password)[0][3] #your login 
-    value_find = (dbf.find_in_table_for_list(dbname,"messaging",column_name="reciever,id",search_value=(sender,message_number),ip=host,user=user,password=password) or'') 
-    value_find_sender = (dbf.find_in_table_for_list(dbname,"messaging",column_name="sender,id",search_value=(sender,message_number),ip=host,user=user,password=password) or'') 
+    value_find = (dbf.find_in_table(dbname,"messaging",column_name="reciever",search_value=sender,ip=host,user=user,password=password) or'') 
+    value_find_sender = (dbf.find_in_table(dbname,"messaging",column_name="sender",search_value=sender,ip=host,user=user,password=password) or'') 
     senders_texts = ' '
     recieved_texts = ' '
     #check messages sended to different users
@@ -140,14 +140,16 @@ def messaging():
                 value_find_in_table = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(reciever),ip=host,user=user,password=password)
                 #if we found that reciever exists than
                 if len(value_find_in_table or '')>=1:
-
+                    lens_of_messages = len(dbf.find_in_table(dbname,'messaging',column_name="sender",search_value=sender,ip=host,user=user,password=password))
+                    lens_of_messages +=1
+                    print(lens_of_messages)
                     secret1 = dbf.find_in_table(dbname,table_name,column_name="login",search_value=reciever,ip=host,user=user,password=password)[0][0]
                     secret2 = dbf.find_in_table(dbname,table_name,column_name="login",search_value=sender,ip=host,user=user,password=password)[0][0]
                     send_message = encryption(str(secret1+secret2),message)
-                    dbf.insert_in_table(dbname,'messaging',columns_names="id",values=message_number,ip=host,user=user,password=password)
-                    dbf.update_row(dbname,'messaging','id',message_number,column_name="sender",text_value=sender,ip=host,user=user,password=password)
-                    dbf.update_row(dbname,'messaging','id',message_number,column_name="reciever",text_value=reciever,ip=host,user=user,password=password)
-                    dbf.update_row(dbname,'messaging','id',message_number,column_name="message",text_value=str(send_message),ip=host,user=user,password=password)
+                    dbf.insert_in_table(dbname,'messaging',columns_names="id",values=lens_of_messages,ip=host,user=user,password=password)
+                    dbf.update_row(dbname,'messaging','id',lens_of_messages,column_name="sender",text_value=sender,ip=host,user=user,password=password)
+                    dbf.update_row(dbname,'messaging','id',lens_of_messages,column_name="reciever",text_value=reciever,ip=host,user=user,password=password)
+                    dbf.update_row(dbname,'messaging','id',lens_of_messages,column_name="message",text_value=str(send_message),ip=host,user=user,password=password)
                     sended_message = ' Sended message: ' +str(message)+ ' to '+ str(reciever)
                     return render_template('messaging.html', msg = 'Sended message ',recieved_messages= recieved_texts, your_login=sender, sended_messages= sended_message)
                 else:
