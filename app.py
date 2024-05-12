@@ -1,6 +1,6 @@
 
 from flask import Flask, request,redirect,render_template
-from random import randint
+import requests
 import databasefunctions as dbf
 from hashlib import sha256,md5
 import secretsfile
@@ -99,12 +99,18 @@ def messaging():
     hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest() #hashed id
     sender = dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password)[0][3] #your login 
     value_find = (dbf.find_in_table_for_list(dbname,"messaging",column_name="reciever,id",search_value=(sender,message_number),ip=host,user=user,password=password) or'') 
-    senders_texts = 'From '
-    #check number of messages to you from different users
+    value_find_sender = (dbf.find_in_table_for_list(dbname,"messaging",column_name="sender,id",search_value=(sender,message_number),ip=host,user=user,password=password) or'') 
+    senders_texts = ' '
+    recieved_texts = ' '
+    #check messages sended to different users
+    for i in value_find_sender:
+        reciever_hash = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(i[2]),ip=host,user=user,password=password)[0][0]
+        senders_texts += ' Sended message: '+ decryption(str(hash_id+reciever_hash),i[3]).decode('utf-8') +"; to " + str(i[2])
 
+    #check messages recived from different users
     for i in value_find:
         sender_hash = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(i[1]),ip=host,user=user,password=password)[0][0]
-        senders_texts += str(i[1]) + ' to you '+ decryption(str(sender_hash+hash_id),i[3]).decode('utf-8')
+        recieved_texts += str(i[1]) + ' to you message:  '+ decryption(str(sender_hash+hash_id),i[3]).decode('utf-8')
 
 
     # send message from you to another user
@@ -122,7 +128,7 @@ def messaging():
                 if len(message) >= 100:
                     return render_template('messaging.html', msg = 'Message is too long')
 
-                print(dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password))
+                #print(dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password))
                 value_find_in_table = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(reciever),ip=host,user=user,password=password)
                 #if we found that reciever exists than
                 if len(value_find_in_table or '')>=1:
@@ -135,12 +141,12 @@ def messaging():
                     dbf.update_row(dbname,'messaging','id',message_number,column_name="reciever",text_value=reciever,ip=host,user=user,password=password)
                     dbf.update_row(dbname,'messaging','id',message_number,column_name="message",text_value=str(send_message),ip=host,user=user,password=password)
 
-                    return render_template('messaging.html', msg = 'This login is used')
+                    return render_template('messaging.html', msg = 'Sended message ',recieved_messages= recieved_texts, your_login=sender, sended_messages= senders_texts)
                 else:
                     
-                    return render_template('messaging.html',msg = "message field is empty or reciever doesnt exist",recieved_messages= senders_texts,your_login=sender)
+                    return render_template('messaging.html',msg = "message field is empty or reciever doesnt exist",recieved_messages= recieved_texts, your_login=sender, sended_messages= senders_texts)
     else: 
-        return render_template('messaging.html',msg = "hi on messaging",recieved_messages=senders_texts,your_login=sender )
+        return render_template('messaging.html',msg = "hi on messaging", recieved_messages=recieved_texts, your_login=sender, sended_messages= senders_texts)
 
 
 #redirect on accept and not page
@@ -171,7 +177,9 @@ def move_notaccept():
 def move_delete():
     ip_addr = request.remote_addr
     hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
+    login = (dbf.find_in_table(dbname,table_name,column_name="id",search_value=hash_id,ip=host,user=user,password=password)[0][3] or '')
     dbf.delete_row_in_table(dbname,table_name,column_name="id",search_value=str(hash_id),ip=host,user=user,password=password)
+    dbf.delete_row_in_table(dbname,"messaging",column_name="sender",search_value=str(login),ip=host,user=user,password=password)
     return render_template('start.html')
 
 
@@ -182,17 +190,24 @@ def move_delete():
 def main_page():
     ip_addr = request.remote_addr
     hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
-    text = "you are here"
-    value = ""
+    text = "You can send message to administration"
+    TOKEN = secretsfile.TOKEN
+    chat_id = secretsfile.chat_id
     value_ip = dbf.find_in_table(dbname,table_name,column_name="ip",search_value=str(ip_addr),ip=host,user=user,password=password)
-    print(value)
+    # sends the message to admin chat in telegram
     if len(value_ip or '')>=1:
-        return render_template('main.html', msg = text,value=ip_addr)
-    else:
+        value = "Your ip address: "+ str(ip_addr)
         if request.method == 'POST' and 'text' in request.form  :
             text = request.form['text']
+            message = "from hash_id: "+ str(hash_id) + "  message: " + str(text)
+            url = f"https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={chat_id}&text={message}"
+            requests.get(url).json() # sends the message to admin chat in telegram
             dbf.update_row(dbname,table_name,'id',hash_id,column_name="text",text_value=text,ip=host,user=user,password=password)
-
+            text = "Message to administration: "+ str(text)
+            return render_template('main.html', msg = text,value=value)
+        else:
+            return render_template('main.html', msg = text, value=value)
+    else:
         return render_template('main.html', msg = text)
 
 
@@ -202,7 +217,7 @@ def start_page():
     global value_int
     hash_ip = sha256(str(ip_addr).encode()).hexdigest()
     value = dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password)
-    print(value)
+    #print(value)
     if len(value or '')>=1:
         return redirect('/main_page')
     else:
@@ -218,16 +233,7 @@ def start_page():
     
 
 
-# 
-# 
-# ip_addr = request.environ['REMOTE_ADDR']
-# 
 
-
-# 
-# 
-# ip_addr = request.environ.get('HTTP_X_FORWARDED_FOR', request.remote_addr)
-# 
 if __name__ == "__main__":   
 
 

@@ -22,13 +22,13 @@ def create_table(dbname,table_name,ip,user,password):
     try:
         mariadbConnection = connection_to_db(ip,dbname,user,password)
         cursor = mariadbConnection.cursor()
-        print("Connected to Mariadb")
+        #print("Connected to Mariadb")
         #cursor.execute("DROP TABLE IF EXISTS " +table_name)
         sql_update_query = """CREATE TABLE %s (
         id VARCHAR(80))"""
         cursor.execute(sql_update_query % (table_name))
         mariadbConnection.commit()
-        print("Table created successfully")
+        #print("Table created successfully")
         cursor.close()
 
     except mariadb.Error as error:
@@ -36,19 +36,19 @@ def create_table(dbname,table_name,ip,user,password):
     finally:
         if mariadbConnection:
             mariadbConnection.close()
-            print("The mariadb connection is closed")
+            #print("The mariadb connection is closed")
 
 #update value of a row
 def update_row(dbname,table_name,search_id,hash_id,column_name,text_value,ip,user,password):
     try:
         mariadbConnection = connection_to_db(ip,dbname,user,password)
         cursor = mariadbConnection.cursor()
-        print("Connected to mariadb")
+        #print("Connected to mariadb")
 
         sql_update_query = """Update %s set %s = '%s' where %s = '%s'"""
         cursor.execute(sql_update_query % (table_name,column_name,text_value,search_id,hash_id))
         mariadbConnection.commit()
-        print("Record Updated successfully ")
+        #print("Record Updated successfully ")
         cursor.close()
 
     except mariadb.Error as error:
@@ -56,19 +56,19 @@ def update_row(dbname,table_name,search_id,hash_id,column_name,text_value,ip,use
     finally:
         if mariadbConnection:
             mariadbConnection.close()
-            print("The mariadb connection is closed")
+            #print("The mariadb connection is closed")
 
 #add column in a table 
 def add_column(dbname,table_name,column_name,value_type,ip,user,password):
     try:
         mariadbConnection = connection_to_db(ip,dbname,user,password)
         cursor = mariadbConnection.cursor()
-        print("Connected to mariadb")
+        #print("Connected to mariadb")
 
         sql_update_query = """Alter table %s add %s %s"""
         cursor.execute(sql_update_query % (table_name,column_name,value_type))
         mariadbConnection.commit()
-        print("alter table successfully ")
+        #print("alter table successfully ")
         cursor.close()
 
     except mariadb.Error as error:
@@ -76,19 +76,19 @@ def add_column(dbname,table_name,column_name,value_type,ip,user,password):
     finally:
         if mariadbConnection:
             mariadbConnection.close()
-            print("The ariadb connection is closed")
+            #print("The ariadb connection is closed")
 
 #inset row in a table
 def insert_in_table(dbname,table_name,columns_names,values,ip,user,password):
     try:
         mariadbConnection = connection_to_db(ip,dbname,user,password)
         cursor = mariadbConnection.cursor()
-        print("Connected to mariadb")
+        #print("Connected to mariadb")
 
         sql_update_query = """INSERT INTO %s (%s) VALUES('%s');"""
         cursor.execute(sql_update_query % (table_name,columns_names,values))
         mariadbConnection.commit()
-        print("alter table successfully ")
+        #print("alter table successfully ")
         cursor.close()
 
     except mariadb.Error as error:
@@ -96,14 +96,14 @@ def insert_in_table(dbname,table_name,columns_names,values,ip,user,password):
     finally:
         if mariadbConnection:
             mariadbConnection.close()
-            print("The mariadb connection is closed")
+            #print("The mariadb connection is closed")
 
 #find value in a table
 def find_in_table(dbname,table_name,column_name,search_value,ip,user,password):
     try:
         mariadbConnection = connection_to_db(ip,dbname,user,password)
         cursor = mariadbConnection.cursor()
-        print("Connected to mariadb")
+        #print("Connected to mariadb")
         sql_update_query = """SELECT * FROM %s WHERE %s = '%s'"""
         cursor.execute(sql_update_query % (table_name,column_name,search_value))
         value = cursor.fetchall()
@@ -115,7 +115,7 @@ def find_in_table(dbname,table_name,column_name,search_value,ip,user,password):
     finally:
         if mariadbConnection:
             mariadbConnection.close()
-            print("The mariadb connection is closed")
+            #print("The mariadb connection is closed")
 
 
 #пуе value of column in a table
@@ -123,7 +123,7 @@ def find_column_in_table(dbname,table_name,column_name,ip,user,password):
     try:
         mariadbConnection = connection_to_db(ip,dbname,user,password)
         cursor = mariadbConnection.cursor()
-        print("Connected to mariadb")
+        #print("Connected to mariadb")
         sql_update_query = """SELECT %s FROM %s"""
         cursor.execute(sql_update_query % (column_name,table_name))
         value = cursor.fetchall()
@@ -135,14 +135,14 @@ def find_column_in_table(dbname,table_name,column_name,ip,user,password):
     finally:
         if mariadbConnection:
             mariadbConnection.close()
-            print("The mariadb connection is closed")
+            #print("The mariadb connection is closed")
 
 #find ьгдешздн value in a table            
 def find_in_table_for_list(dbname,table_name,column_name,search_value,ip,user,password):
     try:
         mariadbConnection = connection_to_db(ip,dbname,user,password)
         cursor = mariadbConnection.cursor()
-        print("Connected to mariadb")
+        #print("Connected to mariadb")
         sql_update_query = """SELECT * FROM %s WHERE (%s) = %s"""
         cursor.execute(sql_update_query % (table_name,column_name,search_value))
         value = cursor.fetchall()
@@ -154,17 +154,17 @@ def find_in_table_for_list(dbname,table_name,column_name,search_value,ip,user,pa
     finally:
         if mariadbConnection:
             mariadbConnection.close()
-            print("The mariadb connection is closed")
+            #print("The mariadb connection is closed")
 #we are deleting row from table
 def delete_row_in_table(dbname,table_name,column_name,search_value,ip,user,password):
     try:
         mariadbConnection = connection_to_db(ip,dbname,user,password)
         cursor = mariadbConnection.cursor()
-        print("Connected to mariadb for deleting")
+        #print("Connected to mariadb for deleting")
         sql_update_query = """DELETE FROM %s WHERE %s = '%s'"""
         cursor.execute(sql_update_query % (table_name,column_name,search_value))
         mariadbConnection.commit()
-        print("Deleting is successfully")
+        #print("Deleting is successfully")
         cursor.close()
 
     except mariadb.Error as error:
@@ -172,4 +172,4 @@ def delete_row_in_table(dbname,table_name,column_name,search_value,ip,user,passw
     finally:
         if mariadbConnection:
             mariadbConnection.close()
-            print("The mariadb connection is closed")
+            #print("The mariadb connection is closed")
