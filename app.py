@@ -66,7 +66,7 @@ def pre_messaging():
         senders_texts += str(i[1]) + 'to'+ decryption(str(sender_hash+hash_id),i[3]).decode('utf-8')
 
      #check number of messages to you from different users
-    if len(name_in_table or '')>=2 and name_in_table[0][3] is not None:
+    if len(name_in_table or '')>=1 and name_in_table[0][3] is not None:
         return redirect('/pre_messaging/messaging')
     
     else:
@@ -222,7 +222,7 @@ def main_page():
 @app.route('/')
 def start_page():
     ip_addr = request.remote_addr
-    global value_int
+    value_int = randint(0,1000)
     hash_ip = sha256(str(ip_addr).encode()).hexdigest()
     value = dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password)
     #print(value)
