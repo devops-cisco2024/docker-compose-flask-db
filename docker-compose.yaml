@@ -13,17 +13,19 @@ services:
       - frontend
 
   db:
-    image: mariadb:lts
+    image: jbergstroem/mariadb-alpine:latest
     healthcheck:
       test: ["CMD", "mariadb", "--version", "--silent"]
       interval: 3s
       retries: 5
       start_period: 30s
     environment:
-      - MARIADB_USER=user1
-      - MARIADB_PASSWORD=password1
-      - MARIADB_DATABASE=visitors
-      - MARIADB_ROOT_PASSWORD=my-secret-pw
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
     networks:
       - backend
 
@@ -43,3 +45,7 @@ services:
 networks:
   backend:
   frontend: 
+
+volumes:
+  db-data:
+    external: true
