@@ -73,10 +73,12 @@ def pre_messaging():
         if request.method == 'POST' and 'text' in request.form  :
             text = request.form['text'].lower()
             value_find_in_table = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(text),ip=host,user=user,password=password)
+            print('111111')
             if len(value_find_in_table or '')>=1:
-
+                print('22222')
                 return render_template('premessaging.html', msg = 'This login is used',recieved_message = senders_texts,your_login=sender)
             else:
+                print('333333')
                 dbf.update_row(dbname,table_name,'id',hash_id,column_name="login",text_value=text,ip=host,user=user,password=password)
                 return redirect('/pre_messaging/messaging')
         else:
@@ -183,12 +185,15 @@ def move_notaccept():
 #if our visitor whant to delete value from table
 @app.route("/move_delete/", methods=['POST'])
 def move_delete():
-    ip_addr = request.remote_addr
-    hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
-    login = (dbf.find_in_table(dbname,table_name,column_name="id",search_value=hash_id,ip=host,user=user,password=password)[0][3] or '')
-    dbf.delete_row_in_table(dbname,table_name,column_name="id",search_value=str(hash_id),ip=host,user=user,password=password)
-    dbf.delete_row_in_table(dbname,"messaging",column_name="sender",search_value=str(login),ip=host,user=user,password=password)
-    return render_template('start.html')
+    try:
+        ip_addr = request.remote_addr
+        hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
+        login = dbf.find_in_table(dbname,table_name,column_name="id",search_value=hash_id,ip=host,user=user,password=password)[0][3] 
+        dbf.delete_row_in_table(dbname,table_name,column_name="id",search_value=str(hash_id),ip=host,user=user,password=password)
+        dbf.delete_row_in_table(dbname,"messaging",column_name="sender",search_value=str(login),ip=host,user=user,password=password)
+        return render_template('start.html')
+    except IndexError:
+        return render_template('start.html')
 
 
 #def messaging
@@ -222,7 +227,7 @@ def main_page():
 @app.route('/')
 def start_page():
     ip_addr = request.remote_addr
-    value_int = randint(0,1000)
+    global value_int
     hash_ip = sha256(str(ip_addr).encode()).hexdigest()
     value = dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password)
     #print(value)
