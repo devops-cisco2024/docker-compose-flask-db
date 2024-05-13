@@ -1,3 +1,4 @@
+
 # docker-compose-flask-db-app
 
 Docker-compose-flask-db-app is a Python app which run messaging site on flask.
@@ -42,4 +43,23 @@ chat_id = "string"
 Start the app.py with the command 
 ```bash
 python3 app.py
+
+# Docker-compose-flask-db application
+
+Before starting the docker-compose.yaml file:
+- you should create a named volume by command:
+```bash
+docker volume create db-data
+```
+- replace the variable values in the .env file with your own.
+- change path to nginx SSL certificates in `nginx/default.conf` and `nginx/Dockerfile` files
+
+Build application image with command:
+```bash
+docker compose build
+```
+Start the `docker-compose.yaml` file with the command (you can use the `-d` option for starting in detached mode):
+```bash
+docker compose up
+
 ```
