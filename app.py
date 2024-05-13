@@ -46,36 +46,39 @@ def gen_fernet_key(passcode:bytes) -> bytes:
 
 @app.route('/pre_messaging/', methods =['GET', 'POST'])
 def pre_messaging():
-    ip_addr = request.remote_addr
-    hash_ip = sha256(str(ip_addr).encode()).hexdigest()
-    hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
-    name_in_table = dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password)
-    sender = dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password)[0][3]
-    value_find = (dbf.find_in_table_for_list(dbname,"messaging",column_name="reciever,id",search_value=(sender,message_number),ip=host,user=user,password=password) or'')
-    senders_texts = 'From'
+    try:
+        ip_addr = request.remote_addr
+        hash_ip = sha256(str(ip_addr).encode()).hexdigest()
+        hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
+        name_in_table = dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password)
+        sender = dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password)[0][3]
+        value_find = (dbf.find_in_table_for_list(dbname,"messaging",column_name="reciever,id",search_value=(sender,message_number),ip=host,user=user,password=password) or'')
+        senders_texts = 'From'
 
-    for i in value_find:
-        sender_hash = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(i[1]),ip=host,user=user,password=password)[0][0]
-        senders_texts += str(i[1]) + 'to'+ decryption(str(sender_hash+hash_id),i[3]).decode('utf-8')
+        for i in value_find:
+            sender_hash = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(i[1]),ip=host,user=user,password=password)[0][0]
+            senders_texts += str(i[1]) + 'to'+ decryption(str(sender_hash+hash_id),i[3]).decode('utf-8')
 
-     #check number of messages to you from different users
-    if len(name_in_table or '')>=1 and name_in_table[0][3] is not None:
-        return redirect('/pre_messaging/messaging')
-    
-    else:
-        if request.method == 'POST' and 'text' in request.form  :
-            text = request.form['text'].lower()
-            value_find_in_table = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(text),ip=host,user=user,password=password)
-            print('111111')
-            if len(value_find_in_table or '')>=1:
-                print('22222')
-                return render_template('premessaging.html', msg = 'This login is used',recieved_message = senders_texts,your_login=sender)
-            else:
-                print('333333')
-                dbf.update_row(dbname,table_name,'id',hash_id,column_name="login",text_value=text,ip=host,user=user,password=password)
-                return redirect('/pre_messaging/messaging')
+        #check number of messages to you from different users
+        if len(name_in_table or '')>=1 and name_in_table[0][3] is not None:
+            return redirect('/pre_messaging/messaging')
+        
         else:
-            return render_template('premessaging.html')
+            if request.method == 'POST' and 'text' in request.form  :
+                text = request.form['text'].lower()
+                value_find_in_table = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(text),ip=host,user=user,password=password)
+                print('111111')
+                if len(value_find_in_table or '')>=1:
+                    print('22222')
+                    return render_template('premessaging.html', msg = 'This login is used',recieved_message = senders_texts,your_login=sender)
+                else:
+                    print('333333')
+                    dbf.update_row(dbname,table_name,'id',hash_id,column_name="login",text_value=text,ip=host,user=user,password=password)
+                    return redirect('/pre_messaging/messaging')
+            else:
+                return render_template('premessaging.html')
+    except:
+        return redirect('/')
 
 
 @app.route("/pre_messaging/delete_message/", methods=['POST'])
@@ -113,7 +116,6 @@ def messaging():
         #who is ready to talk 
         Ready_talk=''
         for i in (dbf.find_column_in_table(dbname,table_name,column_name="login",ip=host,user=user,password=password) or''):
-            print(i)
             if i[0] is not None:
                 Ready_talk+= ' '+str(i[0])
 
@@ -197,27 +199,31 @@ def move_delete():
 
 @app.route('/main_page', methods =['GET', 'POST'])
 def main_page():
-    ip_addr = request.remote_addr
-    hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
-    text = "You can send message to administration"
-    TOKEN = secretsfile.TOKEN
-    chat_id = secretsfile.chat_id
-    value_ip = dbf.find_in_table(dbname,table_name,column_name="ip",search_value=str(ip_addr),ip=host,user=user,password=password)
-    # sends the message to admin chat in telegram
-    if len(value_ip or '')>=1:
-        value = "Your ip address: "+ str(ip_addr)
-        if request.method == 'POST' and 'text' in request.form  :
-            text = request.form['text']
-            message = "from hash_id: "+ str(hash_id) + "  message: " + str(text)
-            url = f"https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={chat_id}&text={message}"
-            requests.get(url).json() # sends the message to admin chat in telegram
-            dbf.update_row(dbname,table_name,'id',hash_id,column_name="text",text_value=text,ip=host,user=user,password=password)
-            text = "Message to administration: "+ str(text)
-            return render_template('main.html', msg = text,value=value)
+    try:
+        ip_addr = request.remote_addr
+        hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
+        dbf.find_in_table(dbname,table_name,column_name="id",search_value=str(hash_id),ip=host,user=user,password=password)[0][0]
+        text = "You can send message to administration"
+        TOKEN = secretsfile.TOKEN
+        chat_id = secretsfile.chat_id
+        value_ip = dbf.find_in_table(dbname,table_name,column_name="ip",search_value=str(ip_addr),ip=host,user=user,password=password)
+        # sends the message to admin chat in telegram
+        if len(value_ip or '')>=1:
+            value = "Your ip address: "+ str(ip_addr)
+            if request.method == 'POST' and 'text' in request.form  :
+                text = request.form['text']
+                message = "from hash_id: "+ str(hash_id) + "  message: " + str(text)
+                url = f"https://api.telegram.org/bot{TOKEN}/sendMessage?chat_id={chat_id}&text={message}"
+                requests.get(url).json() # sends the message to admin chat in telegram
+                dbf.update_row(dbname,table_name,'id',hash_id,column_name="text",text_value=text,ip=host,user=user,password=password)
+                text = "Message to administration: "+ str(text)
+                return render_template('main.html', msg = text,value=value)
+            else:
+                return render_template('main.html', msg = text, value=value)
         else:
-            return render_template('main.html', msg = text, value=value)
-    else:
-        return render_template('main.html', msg = text)
+            return render_template('main.html', msg = text)
+    except:
+        return redirect('/')
 
 
 @app.route('/')
