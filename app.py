@@ -107,8 +107,9 @@ def messaging():
             senders_texts += " "
         else: 
             for i in value_find_sender:
+                sender_hash = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(i[1]),ip=host,user=user,password=password)[0][0]
                 reciever_hash = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(i[2]),ip=host,user=user,password=password)[0][0]
-                senders_texts += ' Sended message: '+ decryption(str(hash_id+reciever_hash),i[3]).decode('utf-8') +" to " + str(i[2]) +";"
+                senders_texts += ' Sended message: '+ decryption(str(sender_hash+reciever_hash),i[3]).decode('utf-8') +" to " + str(i[2]) +";"
 
         #check messages recived from different users
         if value_find_sender is None:
@@ -116,7 +117,8 @@ def messaging():
         else: 
             for i in value_find:
                 sender_hash = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(i[1]),ip=host,user=user,password=password)[0][0]
-                recieved_texts += " "+ str(i[1]) + ' to you message:  '+ decryption(str(sender_hash+hash_id),i[3]).decode('utf-8') + ";"
+                reciever_hash = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(i[2]),ip=host,user=user,password=password)[0][0]
+                recieved_texts += " "+ str(i[1]) + ' to you message:  '+ decryption(str(sender_hash+reciever_hash),i[3]).decode('utf-8') + ";"
         
 
         #who is ready to talk 
