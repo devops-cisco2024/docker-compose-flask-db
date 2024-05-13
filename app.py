@@ -129,7 +129,7 @@ def messaging():
             return redirect('/pre_messaging/')
         else:
         # send message from you to another user
-            if request.method == 'POST' and 'message' in request.form and 'reciever' in request.form  :
+            if request.method == 'POST' and 'message' in request.form and 'reciever' in request.form :
                     message = request.form['message']
                     reciever = request.form['reciever']
                     number_of_messages = (dbf.find_in_table(dbname,"messaging",column_name="reciever",search_value=reciever,ip=host,user=user,password=password) or '')
