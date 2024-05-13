@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title> premessaging </title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='stylescss.css') }}">  
+        <link rel="shortcut icon" href="{{ url_for('static', filename='spirit1.png') }}">              
+    </head>
+
+    <body></br></br></br></br></br>
+             <div class="header">
+                <h1 class="word">Write your Login for messaging</h1>
+             </div></br></br></br>
+            <h2 class="word">
+                <form action="{{ url_for('pre_messaging') }}" method="post">
+                  <div class="msg">{{ msg }}</div>
+                    <input id="text" name="text" type="text" placeholder="Enter your login" class="textbox" style="width: 50%;height: 50px;"/></br></br>
+                    <input type="submit" class="btn" value="Login" style="background-color: rgb(37, 5, 112);color: #fffefe;width: 30%;font-size: 40px;"></br>
+                </form>
+            </h2>
+          </div>
+        </div>
+    </body>
+</html>

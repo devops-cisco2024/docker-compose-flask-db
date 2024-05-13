@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+    <style>
+
+  </style>
+    <head>
+        <meta charset="UTF-8">
+        <title> main </title> 
+        <link rel="icon" type="image/png" href="spirit1.png">
+        <link rel="shortcut icon" href="{{ url_for('static', filename='spirit1.png') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='stylescss.css') }}">               
+    </head>
+
+    <body></br></br></br></br></br>
+             <div class="header">
+                <h1 class="word">Write text to send to the administrator chat.</h1>
+             </div></br></br></br>
+            <h2 class="word">
+                <form action="{{ url_for('main_page') }}" method="post">
+                  <h3 class="msg">{{ msg }}</h3>
+
+                  <h3 class="msg">{{ value }}</h3>
+                    <input id="text" name="text" type="text" placeholder="Enter Your text to administration" class="textbox" style="height: 50px; color:rgb(190, 185, 185)"/></br></br>
+                    <input type="submit" class="btn" value="Send text to admins" style="background-color: grey;color: #fffefe;  width: 250px; height: 100px; padding: 8px 8px;"></br>
+                </form>
+            </h2>
+            <div style="display: flex;">
+       <form action="/pre_messaging/" method="post">
+            <button name="forwardBtn" type="submit" style="background-color: rgb(10, 114, 15);color: #fffefe; width: 250px;">Messaging with other</button>
+        </form>
+            <form action="/move_delete/" method="post">
+              <button name="forwardBtn" type="submit" style="background-color: red;color: #fffefe;  width: 250px;">Delete your data</button>
+          </form>
+          </div>
+          </div>
+        </div>
+    </body>
+</html>

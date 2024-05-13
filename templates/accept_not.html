@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title> GDRP </title>
+        <link rel="icon" type="image/png" href="spirit1.png">
+        <link rel="stylesheet" href="{{ url_for('static', filename='stylescss.css') }}"> 
+        <link rel="shortcut icon" href="{{ url_for('static', filename='spirit1.png') }}">              
+    </head>
+
+    <body ></br></br></br></br></br>
+             <div class="header">
+                <h1 class="word">Work with your info</h1>
+             </div></br></br></br>
+             <h2 style="width: 70%; margin-left: 13%;">The GDPR is an EU regulation on data protection and privacy.
+                It aims to give citizens control over their personal data and simplify the regulatory framework for international businesses.
+                The GDPR protects personal data, i.e. any information relating to an identified or identifiable person.</h2>
+                <br><h2 style="color: rgb(245, 63, 63); background-color: white;">By clicking the accept button, you grant us access to process your personal information.</h2>
+            <div style="display: flex;">
+             <form action="/move_accept/" method="post">
+                <button name="forwardBtn"  style="width: 250px;"
+                >Accept</button>
+            </form>
+             <form action="/move_notaccept/" method="post">
+                <button name="forwardBtn" type="submit" style="
+                background-color: #c50515; width: 250px;">Deny</button>
+            </form>
+        </div>
+          </div>
+        </div>
+    </body>
+</html>

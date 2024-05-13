@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <meta charset="UTF-8">
+        <title> Messaging </title> 
+        <link rel="shortcut icon" href="{{ url_for('static', filename='spirit1.png') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='stylescss.css') }}">         
+    </head>
+    
+<body>
+    <nav class="navbar">
+        <ul>
+            <li> <a href="{{ url_for('main_page') }}">Main Page</a></li>
+        </ul>   
+    </nav>  
+    <h1 class="word">You can write messages to users</h1>
+           
+
+             <div style="display: flex; flex-direction: column;">
+                <h2 class="word"  style=" margin: 0;">Your login: {{ your_login }}</h2>
+                <h2 class="word"  style=" margin: 0;">Who is ready to talk: {{ ready_talkers }}</h2>
+                <h2 class="word"  style=" margin: 0;">Recieved messages: {{ recieved_messages }}</h2>
+                <h2 class="word"  style=" margin: 0;">Sended messages: {{ sended_messages }}</h2>
+            </div>
+
+                <form action="/pre_messaging/delete_message/" method="post" style="margin-left: 40%;">
+                    <button name="forwardBtn" type="submit" style="background-color: rgb(109, 108, 108);color: #fffefe;">Delete messages</button>
+                </form>
+                <form action="{{ url_for('messaging') }}" method="post" style="margin-left: 35%;">
+                  <h2 class="msg" style="margin-right: 52%; border-color: grey;">{{ msg }}</h2>
+                    <input id="reciever" name="reciever" type="text" placeholder="Enter Reciever" class="textbox" style="margin: 0px 0px 0px 8px ;margin-left: 5%; background-color: white; " /><br>
+                    <input id="message" name="message" type="text" placeholder="Enter Message" class="textbox" style="margin: 0px 0px 0px 8px ;margin-left: 5%; background-color: white; "/><br>
+                    <input type="submit" class="btn" value="Send text" style="background-color: grey;color: white; margin-left: 8%; width: 28%;"></br>
+                </form>
+            </h2>
+          
+
+    </body>
+</html>
