@@ -96,7 +96,6 @@ def messaging():
     try:    
         ip_addr = request.remote_addr
         hash_ip = sha256(str(ip_addr).encode()).hexdigest() #hashed ip
-        hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest() #hashed id
         sender = dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password)[0][3] #your login 
         value_find = dbf.find_in_table(dbname,"messaging",column_name="reciever",search_value=sender,ip=host,user=user,password=password) 
         value_find_sender = dbf.find_in_table(dbname,"messaging",column_name="sender",search_value=sender,ip=host,user=user,password=password)
@@ -151,7 +150,7 @@ def messaging():
                             lens_of_messages =sha256((str(randint(0,1000)+randint(0,1000))).encode()).hexdigest()
                             secret1 = dbf.find_in_table(dbname,table_name,column_name="login",search_value=reciever,ip=host,user=user,password=password)[0][0]
                             secret2 = dbf.find_in_table(dbname,table_name,column_name="login",search_value=sender,ip=host,user=user,password=password)[0][0]
-                            send_message = encryption(str(secret1+secret2),message)
+                            send_message = encryption(str(secret2+secret1),message)
                             dbf.insert_in_table(dbname,'messaging',columns_names="id",values=lens_of_messages,ip=host,user=user,password=password)
                             dbf.update_row(dbname,'messaging','id',lens_of_messages,column_name="sender",text_value=sender,ip=host,user=user,password=password)
                             dbf.update_row(dbname,'messaging','id',lens_of_messages,column_name="reciever",text_value=reciever,ip=host,user=user,password=password)
