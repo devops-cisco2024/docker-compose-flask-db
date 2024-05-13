@@ -43,7 +43,7 @@ chat_id = "string"
 Start the app.py with the command 
 ```bash
 python3 app.py
-
+```
 # Docker-compose-flask-db application
 
 Before starting the docker-compose.yaml file:
