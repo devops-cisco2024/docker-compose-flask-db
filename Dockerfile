@@ -9,7 +9,7 @@ RUN apt-get update && \
     apt-get install -y libmariadb-dev
 COPY app.py databasefunctions.py secrets.py /app/
 COPY /templates   /app/templates
-COPY /statis   /app/static
+COPY /static   /app/static
 COPY --from=builder /temp /usr/local
 
 WORKDIR /app
