@@ -67,12 +67,9 @@ def pre_messaging():
             if request.method == 'POST' and 'text' in request.form  :
                 text = request.form['text'].lower()
                 value_find_in_table = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(text),ip=host,user=user,password=password)
-                print('111111')
                 if len(value_find_in_table or '')>=1:
-                    print('22222')
                     return render_template('premessaging.html', msg = 'This login is used',recieved_message = senders_texts,your_login=sender)
                 else:
-                    print('333333')
                     dbf.update_row(dbname,table_name,'id',hash_id,column_name="login",text_value=text,ip=host,user=user,password=password)
                     return redirect('/pre_messaging/messaging')
             else:
