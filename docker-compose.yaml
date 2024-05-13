@@ -1,0 +1,51 @@
+version: "3"
+services:
+  app:
+    build: .
+    restart: always
+    command: python -u app.py
+    depends_on:
+      db:
+        condition: service_healthy
+
+    networks:
+      - backend
+      - frontend
+
+  db:
+    image: jbergstroem/mariadb-alpine:latest
+    healthcheck:
+      test: ["CMD", "mariadb", "--version", "--silent"]
+      interval: 3s
+      retries: 5
+      start_period: 30s
+    environment:
+      - MARIADB_USER=${MARIADB_USER}
+      - MARIADB_PASSWORD=${MARIADB_PASSWORD}
+      - MARIADB_DATABASE=${MARIADB_DATABASE}
+      - MARIADB_ROOT_PASSWORD=${MARIADB_ROOT_PASSWORD}
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - backend
+
+
+  proxy:
+    build: nginx
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    depends_on: 
+      - app
+    networks:
+       - frontend
+
+
+networks:
+  backend:
+  frontend: 
+
+volumes:
+  db-data:
+    external: true
