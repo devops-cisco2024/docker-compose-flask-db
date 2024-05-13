@@ -118,41 +118,43 @@ def messaging():
         for i in (dbf.find_column_in_table(dbname,table_name,column_name="login",ip=host,user=user,password=password) or''):
             if i[0] is not None:
                 Ready_talk+= ' '+str(i[0])
-
+        if sender is None:
+            return redirect('/pre_messaging/')
+        else:
         # send message from you to another user
-        if request.method == 'POST' and 'message' in request.form and 'reciever' in request.form  :
-                message = request.form['message']
-                reciever = request.form['reciever']
-                number_of_messages = (dbf.find_in_table(dbname,"messaging",column_name="reciever",search_value=reciever,ip=host,user=user,password=password) or '')
-                
-                #max number of messages to you from different users
-                if len(number_of_messages) >= 2:
-                    return render_template('messaging.html',msg = "Max number of messages to reciever",your_login=sender,ready_talkers=Ready_talk)
-                
-                else:
-                    #max len of the message,wich you can send
-                    if len(message) >= 100:
-                        return render_template('messaging.html', msg = 'Message is too long',ready_talkers=Ready_talk)
-
-                    #print(dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password))
-                    value_find_in_table = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(reciever),ip=host,user=user,password=password)
-                    #if we found that reciever exists than
-                    if len(value_find_in_table or '')>=1:
-                        lens_of_messages =sha256((str(randint(0,1000)+randint(0,1000))).encode()).hexdigest()
-                        secret1 = dbf.find_in_table(dbname,table_name,column_name="login",search_value=reciever,ip=host,user=user,password=password)[0][0]
-                        secret2 = dbf.find_in_table(dbname,table_name,column_name="login",search_value=sender,ip=host,user=user,password=password)[0][0]
-                        send_message = encryption(str(secret1+secret2),message)
-                        dbf.insert_in_table(dbname,'messaging',columns_names="id",values=lens_of_messages,ip=host,user=user,password=password)
-                        dbf.update_row(dbname,'messaging','id',lens_of_messages,column_name="sender",text_value=sender,ip=host,user=user,password=password)
-                        dbf.update_row(dbname,'messaging','id',lens_of_messages,column_name="reciever",text_value=reciever,ip=host,user=user,password=password)
-                        dbf.update_row(dbname,'messaging','id',lens_of_messages,column_name="message",text_value=str(send_message),ip=host,user=user,password=password)
-                        sended_message = ' Sended message: ' +str(message)+ ' to '+ str(reciever)
-                        return render_template('messaging.html', msg = 'Sended message ',recieved_messages= recieved_texts, your_login=sender, sended_messages= sended_message)
+            if request.method == 'POST' and 'message' in request.form and 'reciever' in request.form  :
+                    message = request.form['message']
+                    reciever = request.form['reciever']
+                    number_of_messages = (dbf.find_in_table(dbname,"messaging",column_name="reciever",search_value=reciever,ip=host,user=user,password=password) or '')
+                    
+                    #max number of messages to you from different users
+                    if len(number_of_messages) >= 2:
+                        return render_template('messaging.html',msg = "Max number of messages to reciever",your_login=sender,ready_talkers=Ready_talk)
+                    
                     else:
-                        
-                        return render_template('messaging.html',msg = "message field is empty or reciever doesnt exist",recieved_messages= recieved_texts, your_login=sender, sended_messages= senders_texts,ready_talkers=Ready_talk)
-        else: 
-            return render_template('messaging.html',msg = "hi on messaging", recieved_messages=recieved_texts, your_login=sender, sended_messages= senders_texts,ready_talkers=Ready_talk)
+                        #max len of the message,wich you can send
+                        if len(message) >= 100:
+                            return render_template('messaging.html', msg = 'Message is too long',ready_talkers=Ready_talk)
+
+                        #print(dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password))
+                        value_find_in_table = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(reciever),ip=host,user=user,password=password)
+                        #if we found that reciever exists than
+                        if len(value_find_in_table or '')>=1:
+                            lens_of_messages =sha256((str(randint(0,1000)+randint(0,1000))).encode()).hexdigest()
+                            secret1 = dbf.find_in_table(dbname,table_name,column_name="login",search_value=reciever,ip=host,user=user,password=password)[0][0]
+                            secret2 = dbf.find_in_table(dbname,table_name,column_name="login",search_value=sender,ip=host,user=user,password=password)[0][0]
+                            send_message = encryption(str(secret1+secret2),message)
+                            dbf.insert_in_table(dbname,'messaging',columns_names="id",values=lens_of_messages,ip=host,user=user,password=password)
+                            dbf.update_row(dbname,'messaging','id',lens_of_messages,column_name="sender",text_value=sender,ip=host,user=user,password=password)
+                            dbf.update_row(dbname,'messaging','id',lens_of_messages,column_name="reciever",text_value=reciever,ip=host,user=user,password=password)
+                            dbf.update_row(dbname,'messaging','id',lens_of_messages,column_name="message",text_value=str(send_message),ip=host,user=user,password=password)
+                            sended_message = ' Sended message: ' +str(message)+ ' to '+ str(reciever)
+                            return render_template('messaging.html', msg = 'Sended message ',recieved_messages= recieved_texts, your_login=sender, sended_messages= sended_message)
+                        else:
+                            
+                            return render_template('messaging.html',msg = "message field is empty or reciever doesnt exist",recieved_messages= recieved_texts, your_login=sender, sended_messages= senders_texts,ready_talkers=Ready_talk)
+            else: 
+                return render_template('messaging.html',msg = "hi on messaging", recieved_messages=recieved_texts, your_login=sender, sended_messages= senders_texts,ready_talkers=Ready_talk)
     except:
         return redirect('/')
 
@@ -202,7 +204,7 @@ def main_page():
     try:
         ip_addr = request.remote_addr
         hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest()
-        dbf.find_in_table(dbname,table_name,column_name="id",search_value=str(hash_id),ip=host,user=user,password=password)[0][0]
+        dbf.find_in_table(dbname,table_name,column_name="id",search_value=str(hash_id),ip=host,user=user,password=password)[0][0] #check is user exsists in db
         text = "You can send message to administration"
         TOKEN = secretsfile.TOKEN
         chat_id = secretsfile.chat_id
