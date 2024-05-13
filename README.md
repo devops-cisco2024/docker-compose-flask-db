@@ -9,7 +9,7 @@ or any orther path in wich python can acsess this variables:
 pip install -r requirements.txt
 ```
 
-## Variables:
+## Variables in secretsfile.py:
 ```python
 #any value in string for secret key to sign session cookies
 secret_key = "key"
