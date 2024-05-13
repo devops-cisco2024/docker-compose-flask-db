@@ -1,0 +1,80 @@
+global: 
+  scrape_interval: 15s
+  evaluation_interval: 15s #add
+
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: ["localhost:9093"]
+
+rule_files:
+  - "alert_rules.yml"
+
+scrape_configs: 
+  - job_name: "prometheus" 
+    scrape_interval: 15s 
+    static_configs: 
+    - targets: ["localhost:9090"]
+
+  - job_name: "node"
+    scrape_interval: 15s 
+    static_configs: 
+    - targets: ["34.136.249.140:9100"]
+    
+
+  - job_name: "cadvisor" 
+    scrape_interval: 15s 
+    static_configs: 
+    - targets: ["34.136.249.140:9200"]
+
+  - job_name: 'blackbox'
+    metrics_path: /probe
+    params:
+      module:
+        - http_200_module
+        - icmp
+    static_configs:
+      - targets:
+        - https://theranodocker.buzz/
+        
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+  
+  - job_name: blackbox-ssl
+    metrics_path: /probe
+    params:
+      module:
+        - http_2xx
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+      
+    static_configs:
+      - targets:
+        - https://theranodocker.buzz/
+
+  - job_name: blackbox-http
+    metrics_path: /probe
+    params:
+      module:
+        - http_2xx
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115
+      
+    static_configs:
+    - targets:
+      - https://theranodocker.buzz/

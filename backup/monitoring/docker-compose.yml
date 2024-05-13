@@ -1,0 +1,57 @@
+version: '3.8'
+networks:
+  monitoring:
+    driver: bridge
+volumes:
+  prometheus_data: {}
+  #grafana-data: {}
+  alertmanager-data: {}
+
+services:
+  prometheus:
+    image: prom/prometheus
+    user: "1000"
+    environment:
+      - PUID=1000
+      - PGID=1000
+    container_name: prometheus
+    restart: unless-stopped
+    volumes:
+      - ~/promgrafnode/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ~/promgrafnode/prometheus/alert_rules.yml:/etc/prometheus/alert_rules.yml
+      - ~/promgrafnode/prometheus:/prometheus
+
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    ports:
+      - 9090:9090
+    networks:
+      - monitoring
+
+  grafana:
+    image: grafana/grafana:latest
+    user: "1000"
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    volumes:
+      - ~/promgrafnode/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+    networks:
+      - monitoring
+
+  blackbox-exporter:
+    image: prom/blackbox-exporter
+    container_name: blackbox-exporter
+    volumes:
+      - ~/promgrafnode/blackbox-exporter/config.yml:/etc/blackbox-exporter/config.yml
+    command:
+      - '--config.file=/etc/blackbox-exporter/config.yml'
+    ports:
+      - 9115:9115
+    networks:
+      - monitoring
