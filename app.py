@@ -98,19 +98,25 @@ def messaging():
         hash_ip = sha256(str(ip_addr).encode()).hexdigest() #hashed ip
         hash_id = sha256((str(ip_addr)+str(value_int)).encode()).hexdigest() #hashed id
         sender = dbf.find_in_table(dbname,table_name,column_name="hash_ip",search_value=str(hash_ip),ip=host,user=user,password=password)[0][3] #your login 
-        value_find = (dbf.find_in_table(dbname,"messaging",column_name="reciever",search_value=sender,ip=host,user=user,password=password) or'') 
-        value_find_sender = (dbf.find_in_table(dbname,"messaging",column_name="sender",search_value=sender,ip=host,user=user,password=password) or'') 
+        value_find = dbf.find_in_table(dbname,"messaging",column_name="reciever",search_value=sender,ip=host,user=user,password=password) 
+        value_find_sender = dbf.find_in_table(dbname,"messaging",column_name="sender",search_value=sender,ip=host,user=user,password=password)
         senders_texts = ' '
         recieved_texts = ' '
         #check messages sended to different users
-        for i in value_find_sender:
-            reciever_hash = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(i[2]),ip=host,user=user,password=password)[0][0]
-            senders_texts += ' Sended message: '+ decryption(str(hash_id+reciever_hash),i[3]).decode('utf-8') +" to " + str(i[2]) +";"
+        if value_find_sender is None:
+            senders_texts += " "
+        else: 
+            for i in value_find_sender:
+                reciever_hash = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(i[2]),ip=host,user=user,password=password)[0][0]
+                senders_texts += ' Sended message: '+ decryption(str(hash_id+reciever_hash),i[3]).decode('utf-8') +" to " + str(i[2]) +";"
 
         #check messages recived from different users
-        for i in value_find:
-            sender_hash = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(i[1]),ip=host,user=user,password=password)[0][0]
-            recieved_texts += " "+ str(i[1]) + ' to you message:  '+ decryption(str(sender_hash+hash_id),i[3]).decode('utf-8') +";"
+        if value_find_sender is None:
+            recieved_texts += " "
+        else: 
+            for i in value_find:
+                sender_hash = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(i[1]),ip=host,user=user,password=password)[0][0]
+                recieved_texts += " "+ str(i[1]) + ' to you message:  '+ decryption(str(sender_hash+hash_id),i[3]).decode('utf-8') +";"
         
 
         #who is ready to talk 
@@ -155,7 +161,7 @@ def messaging():
                             return render_template('messaging.html',msg = "message field is empty or reciever doesnt exist",recieved_messages= recieved_texts, your_login=sender, sended_messages= senders_texts,ready_talkers=Ready_talk)
             else: 
                 return render_template('messaging.html',msg = "hi on messaging", recieved_messages=recieved_texts, your_login=sender, sended_messages= senders_texts,ready_talkers=Ready_talk)
-    except:
+    except IndexError:
         return redirect('/')
 
 
