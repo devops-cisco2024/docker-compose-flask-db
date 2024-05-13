@@ -116,7 +116,7 @@ def messaging():
         else: 
             for i in value_find:
                 sender_hash = dbf.find_in_table(dbname,table_name,column_name="login",search_value=str(i[1]),ip=host,user=user,password=password)[0][0]
-                recieved_texts += " "+ str(i[1]) + ' to you message:  '+ decryption(str(sender_hash+hash_id),i[3]).decode('utf-8') +";"
+                recieved_texts += " "+ str(i[1]) + ' to you message:  '+ decryption(str(sender_hash+hash_id),i[3]).decode('utf-8') + ";"
         
 
         #who is ready to talk 
