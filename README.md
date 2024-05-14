@@ -58,8 +58,56 @@ Build application image with command:
 ```bash
 docker compose build
 ```
+
+
 Start the `docker-compose.yaml` file with the command (you can use the `-d` option for starting in detached mode):
 ```bash
 docker compose up
 
+```
+
+# Backup
+
+## Description
+This section contains instructions for setting up database backups using Docker and Google Cloud Storage.
+
+## Backup Setup
+
+### Starting the Backup Service
+To get started, run `docker-compose.yml` from the `backup` folder. The service will automatically create a database dump every hour and save it to the `backup` folder.
+
+### Configuring Backups to Google Cloud Storage
+
+#### Google Cloud Authentication
+Authenticate to Google Cloud and configure your project with the following commands:
+```sh
+gcloud auth login
+gcloud config set project [YOUR_PROJECT_ID]
+```
+Replace [YOUR_PROJECT_ID] with your Google Cloud project's ID.
+
+Creating and Configuring a Service Account
+Create a service account and grant it access to your Google Storage:
+
+Create a service account in the Google Cloud Console.
+Download the key in JSON format.
+Set up environment variables to use this key:
+
+```bash
+export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your-service-account-file.json"
+```
+Replace the path with the actual path to your service account key file.
+
+Setting up Synchronization
+Edit the sync_backups.sh file, specifying the name of your Google Storage bucket. Example line in the script:
+```sh
+gsutil cp /path/to/backup/* gs://your-google-storage-bucket
+```
+
+Replace /path/to/backup/* and your-google-storage-bucket with the actual values.
+
+Configuring cron for Automatic Synchronization
+Set up the cron service to run the sync_backups.sh script according to a schedule by adding the following line to your crontab:
+```sh
+0 * * * * /path/to/sync_backups.sh
 ```
