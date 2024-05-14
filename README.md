@@ -111,3 +111,27 @@ Set up the cron service to run the sync_backups.sh script according to a schedul
 ```sh
 0 * * * * /path/to/sync_backups.sh
 ```
+# Monitoring
+
+## Description
+This section outlines the monitoring setup using Prometheus, Grafana, and various exporters to track the health and performance of both the server and the containers running the application and database.
+
+## Monitoring Architecture
+
+### Exporters
+- **Cadvisor Exporter**: Gathers metrics from containers, helping monitor their performance and resource usage.
+- **Node Exporter**: Collects metrics from the server itself, providing insights into system-level metrics.
+- **Blackbox Exporter**: Monitors the uptime and SSL/TLS certificate status of websites.
+
+### Setup Requirements
+To run Prometheus and Grafana, you will need a separate server with Docker installed. This server will host these tools to avoid any performance overhead on your application server.
+
+### Launching Monitoring Services
+Navigate to the `monitoring` folder in the repository and run the following command to start Prometheus and Grafana using Docker Compose:
+```sh
+docker-compose up -d
+```
+Configuring Prometheus and Blackbox Exporter
+Edit the prometheus.yml and blackbox-exporter-config.yml configuration files to match your specific monitoring requirements. This may include setting up scrape intervals, targets, and alert rules for Prometheus, as well as specific modules and probe settings for the Blackbox Exporter.
+
+
